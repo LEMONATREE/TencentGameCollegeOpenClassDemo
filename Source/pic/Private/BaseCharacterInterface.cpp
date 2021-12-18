@@ -82,47 +82,62 @@ void IBaseCharacterInterface::DeathCheck(ABaseCharacter* Character)
 				UpicGameInstance* GI = Cast<UpicGameInstance>(Character->GetWorld()->GetGameInstance());
 				if (GI)
 				{
+					bool NowSaveGame = false;//是否记录游戏
 					if (!Character->GetIsPlayer())//敌人死亡
 					{
-						//关闭BehaviorTree
 						AEnermyCharacter* AI = Cast<AEnermyCharacter>(Character);
+						//关闭BehaviorTree,防止播放死亡动画时抖动
 						AI->StopBehaviorTree();
 						//更新PlayerInfo
 						float NewScore = GI->GetPlayerScore() + (Character->GetMaxHealth()) * (GI->GetCurrentMode() + 1.f);
 						GI->SetPlayerScore(NewScore);
 						GI->PlayerLevelUp();
-						//Check是否进入boss关
-						if (GI->GetPlayerScore() > 200.f && !GI->GetRotationActorIsSpawn())
-						{
-							//生成进入boss关的机关
-							FString RotationActorBP_Path = TEXT("Blueprint'/Game/MyResource/MyRotationActor.MyRotationActor_C'");
-							ARotationActor* ref = Character->BaseSpawnActor<ARotationActor>(RotationActorBP_Path, FVector(1300.f, 200.f, 320.f), FRotator(0.f));
-							ref->SetIntoBossGame(false);
-							ref->SetRotationSpeed(20.f);
-							GI->SetRotationActorIsSpawn(true);
-							//删除阻挡的staticmesh
-							DestroyActorFromName<AStaticMeshActor>(Character->GetWorld(), FString("Wall12"));
+						//Boss/Enermy死亡
+						if(AI->GetEnermyClass() == 2)//Boss死亡，则记录游戏
+						{ 
+							NowSaveGame = true;
 						}
-						//准备接下来的敌人
-						ABaseCharacter* Player = Cast<ABaseCharacter>(Character->GetWorld()->GetFirstPlayerController()->GetCharacter());
-						if (Player)
+						else //Enermy死亡
 						{
-							UpdateLevel(Player);
-							if (GI->GetTotalEnermyNum() > 0)
+							//Check是否进入boss关
+							if (GI->GetPlayerScore() > 200.f && !GI->GetRotationActorIsSpawn())
 							{
-								Player->SetEnermyNumToSpawn(Player->GetEnermyNumToSpawn() + 1);
-								Player->SetToSpawnEnermy((Player->GetEnermyNumToSpawn() == Player->GetMaxExistEnermyNum()));
-								GI->SetTotalEnermyNum(GI->GetTotalEnermyNum() - 1);
+								//生成进入boss关的机关
+								FString RotationActorBP_Path = TEXT("Blueprint'/Game/MyResource/MyRotationActor.MyRotationActor_C'");
+								ARotationActor* ref = Character->BaseSpawnActor<ARotationActor>(RotationActorBP_Path, FVector(1300.f, 200.f, 320.f), FRotator(0.f));
+								ref->SetIntoBossGame(false);
+								ref->SetRotationSpeed(20.f);
+								GI->SetRotationActorIsSpawn(true);
+								//删除阻挡的staticmesh
+								DestroyActorFromName<AStaticMeshActor>(Character->GetWorld(), FString("Wall12"));
 							}
-							else
+							//准备接下来的敌人
+							ABaseCharacter* Player = Cast<ABaseCharacter>(Character->GetWorld()->GetFirstPlayerController()->GetCharacter());
+							if (Player)
 							{
-								Player->SetToSpawnEnermy((Player->GetEnermyNumToSpawn() != 0));
+								UpdateLevel(Player);
+								if (GI->GetTotalEnermyNum() > 0)
+								{
+									Player->SetEnermyNumToSpawn(Player->GetEnermyNumToSpawn() + 1);
+									Player->SetToSpawnEnermy((Player->GetEnermyNumToSpawn() == Player->GetMaxExistEnermyNum()));
+									GI->SetTotalEnermyNum(GI->GetTotalEnermyNum() - 1);
+								}
+								else
+								{
+									Player->SetToSpawnEnermy((Player->GetEnermyNumToSpawn() != 0));
+								}
 							}
 						}
 					}
 					else//玩家死亡
 					{
-						//记录当前积分
+						NowSaveGame = true;
+						//删除所有Enermy/Boss
+						DestroyAllActorFromClass<AEnermyCharacter>(Character->GetWorld());
+					}
+					//记录当前积分
+					if (NowSaveGame)
+					{
 						TSubclassOf<ASaveGameActor> SaveGameActorToFind = ASaveGameActor::StaticClass();
 						TArray<AActor*> FoundActor;
 						UGameplayStatics::GetAllActorsOfClass(Character->GetWorld(), SaveGameActorToFind, FoundActor);
@@ -131,14 +146,6 @@ void IBaseCharacterInterface::DeathCheck(ABaseCharacter* Character)
 							auto SaveGameActor = Cast<ASaveGameActor>(FoundActor[0]);
 							SaveGameActor->SaveGameFile();
 							GEngine->AddOnScreenDebugMessage(0, 2.f, FColor(23, 233, 4, 255), FString::Printf(TEXT("记录击杀分数:%.0f"), GI->GetPlayerScore()));
-						}
-						//删除所有Enermy/Boss
-						TSubclassOf<AEnermyCharacter> EnermyToFind = AEnermyCharacter::StaticClass();
-						TArray<AActor*> FoundEnermy;
-						UGameplayStatics::GetAllActorsOfClass(Character->GetWorld(), EnermyToFind, FoundEnermy);
-						for (auto Enermy : FoundEnermy)
-						{
-							Enermy->Destroy();
 						}
 					}
 				}
@@ -170,14 +177,15 @@ void IBaseCharacterInterface::UpdateLevel(ABaseCharacter* Character)
 	UpicGameInstance* GI = Cast<UpicGameInstance>(Character->GetWorld()->GetGameInstance());
 	if (GI)
 	{
-		Character->SetMaxHealth(100000.f * FMath::Exp2(GI->GetPlayerLevel()));
+		int PlayerLevelEnhance = FMath::Exp2(GI->GetPlayerLevel());
+		Character->SetMaxHealth(1000.f * PlayerLevelEnhance);
 		Character->SetCurrentHealth(Character->GetMaxHealth());
 		Character->SetCurrentEnergy(Character->GetMaxEnergy());
 		auto* Weapon = Character->GetWeapon();
 		if (Weapon)
 		{
 			//GEngine->AddOnScreenDebugMessage(0, 10.f, FColor::Red, FString::Printf(TEXT("uplevel")));
-			Weapon->SetBasicDamage(Weapon->GetBasicDamage() + 50.f); 
+			Weapon->SetBasicDamage(Weapon->GetBasicDamage() + 50.f * PlayerLevelEnhance);
 		}
 	}
 }

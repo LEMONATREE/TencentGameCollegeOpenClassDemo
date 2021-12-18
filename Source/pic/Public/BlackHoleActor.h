@@ -5,23 +5,27 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Runtime/Engine/Classes/Components/SphereComponent.h"
+#include "Components/SceneComponent.h"
 #include "BlackHoleActor.generated.h"
 
 UCLASS()
 class PIC_API ABlackHoleActor : public AActor
 {
 	GENERATED_BODY()
-private:	
+protected:	
 	/** Info */
 	FVector Speed = FVector(0.f);
 	int BlackHoleClass = -1;
 	float DuringTime = 10.f;
 	FTimerHandle OutHandle;
+	/** Scene */
+	UPROPERTY(EditAnywhere)
+	USceneComponent* SceneComp;
 	/** Mesh */
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* MeshComp;
 	/** Collision & Overlap */
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	USphereComponent* SphereComp;
 	bool IsDamageApplied = false;
 	/** IntoBossMap */

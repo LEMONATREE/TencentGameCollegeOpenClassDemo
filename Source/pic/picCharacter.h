@@ -113,4 +113,10 @@ protected:
 public:
 	ApicCharacter();
 	virtual void Tick(float DeltaTime) override;
+
+	void SetViewOnBlackHole(ABlackHoleActor* BlackHole);
+	void DelaySetViewOnBlackHole(ABlackHoleActor* BlackHole, float DelayTime);
+	void ResetViewFromBlackHole();
+	void DelayResetViewFromBlackHole(float DelayTime);
+
 };

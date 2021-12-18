@@ -31,7 +31,7 @@ EBTNodeResult::Type UEnermyJumpBackTaskNode::ExecuteTask(UBehaviorTreeComponent&
 			UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(AI);
 			auto FindPath = NavSystem->FindPathToLocationSynchronously(GetWorld(), AILocation, TargetLocation);//寻找路径
 			float PathCost = FindPath->GetPathCost();
-			GEngine->AddOnScreenDebugMessage(0, 10.f, FColor::Red, FString::Printf(TEXT("PathCost:%f!"),PathCost));
+			//GEngine->AddOnScreenDebugMessage(0, 10.f, FColor::Red, FString::Printf(TEXT("PathCost:%f!"),PathCost));
 			if (PathCost > 0.f)//找到路径才执行jumpback，防止掉下平台
 			{
 				float AnimTime = AI->CastSkill(AI, AI->JumpBack_Montage, 1.f);

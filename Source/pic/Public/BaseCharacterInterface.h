@@ -44,11 +44,22 @@ public:
 		UGameplayStatics::GetAllActorsOfClass(World, ActorToFind, FoundActor);
 		for (auto Actor : FoundActor)
 		{
-			GEngine->AddOnScreenDebugMessage(0, 2.f, FColor(23, 233, 4, 255), FString::Printf(TEXT("Actor Delete")));
+			//GEngine->AddOnScreenDebugMessage(0, 2.f, FColor(23, 233, 4, 255), FString::Printf(TEXT("Actor Delete")));
 			if (Actor->GetName() == ActorName)
 			{		
 				Actor->Destroy();
 			}
+		}
+	}
+	template<typename ObjClass>
+	FORCEINLINE void DestroyAllActorFromClass(UWorld* World)
+	{
+		TSubclassOf<ObjClass> ActorToFind = ObjClass::StaticClass();
+		TArray<AActor*> FoundActor;
+		UGameplayStatics::GetAllActorsOfClass(World, ActorToFind, FoundActor);
+		for (auto Actor : FoundActor)
+		{
+			Actor->Destroy();	
 		}
 	}
 };

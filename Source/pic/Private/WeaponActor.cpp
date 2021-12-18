@@ -26,7 +26,7 @@ void AWeaponActor::OnOverlap(AActor* OverlappedActor, AActor* OtherActor)
 	{
 		if (NowWeapon->IsPlayer != NowCharacter->GetIsPlayer())
 		{
-			if (!NowCharacter->GetIsPlayer())//Enermy受到攻击->朝向受击方向，更新combo
+			if (!NowCharacter->GetIsPlayer() && NowCharacter->GetCurrentHealth() > 0.f)//Enermy受到攻击->朝向受击方向，更新combo
 			{
 				ApicCharacter* Player = Cast<ApicCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 				if (Player)

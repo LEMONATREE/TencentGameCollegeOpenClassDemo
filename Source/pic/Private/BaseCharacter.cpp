@@ -100,7 +100,11 @@ void ABaseCharacter::StopTimerHandle(FTimerHandle& InHandle)//输入必须使用
 
 float ABaseCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	GLog->Log("Now Take Damage...");
+	UE_LOG(LogTemp, Warning, TEXT("Damage:%f!!!"), Damage);
+	if (Damage < 0.f || Damage > 10000000.f)//忽略错误的伤害
+	{
+		return 0.f;
+	}
 	if (!NowRevive)//不处于复活状态
 	{
 		CurrentHealth = FMath::Max(CurrentHealth - Damage, 0.f);
@@ -142,10 +146,3 @@ void ABaseCharacter::Tick(float DeltaTime)
 	FaceSceneCompToCamera();
 }
 
-//void ABaseCharacter::ToggleBool(bool* Sig, bool BoolValue)//用引用无法再TimerDelegate中传参?
-//{
-//	UE_LOG(LogTemp, Warning, TEXT("OrgBool:%d!"), *Sig);
-//	*Sig = BoolValue;
-//	UE_LOG(LogTemp, Warning, TEXT("NowBool:%d!"), *Sig);
-//}
-//

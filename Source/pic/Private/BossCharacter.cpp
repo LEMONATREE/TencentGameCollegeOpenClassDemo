@@ -24,6 +24,10 @@ void ABossCharacter::BossSkill()
 	//pitch,yaw,roll => y,z,x
 	Ring = BaseSpawnActor<ARingActor>(RingBP_Path, BossLocation, FRotator(0.f));
 	Ring->SetActorScale3D(FVector(1.f));
+	if (IsStab == true)
+	{
+		Ring->SetIsStabAttack(true);
+	}
 	FRotator Turn = UKismetMathLibrary::FindLookAtRotation(BossLocation, PlayerLocation);
 	if (RingClass == 0)
 	{
@@ -86,6 +90,8 @@ void ABossCharacter::BeginPlay()
 	Super::BeginPlay();
 	HideWeapon();
 	Weapon->SetActorScale3D(FVector(5.f));
+	MaxHealth = 10000.f;
+	CurrentHealth = 10000.f;
 }
 void ABossCharacter::Tick(float DeltaTime)
 {

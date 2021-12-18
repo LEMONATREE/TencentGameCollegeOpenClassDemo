@@ -38,6 +38,11 @@ void ARingActor::OverLap(UPrimitiveComponent* OverlappedComponent, AActor* Other
 	{
 		IsDamageApplied = true;
 		float damage = FMath::RandRange(100.f, 1000.f);
+		if (IsStabAttack)
+		{
+			damage += Player->GetMaxHealth() * 0.3f;
+		}
+		UE_LOG(LogTemp, Warning, TEXT("RingDamage:%f!!!"),damage);
 		UGameplayStatics::ApplyDamage(OtherActor, damage, nullptr, this, UDamageType::StaticClass());
 		if (Player->GetCurrentEnergy() > 50.f)
 		{

@@ -15,5 +15,5 @@ UpicGameInstance::UpicGameInstance()
 /** Player Info */
 void UpicGameInstance::PlayerLevelUp()
 {
-	PlayerLevel += (CurrentMode + 1);
+	PlayerLevel ++;
 }

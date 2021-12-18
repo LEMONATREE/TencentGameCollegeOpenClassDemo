@@ -49,7 +49,7 @@ void UMoveWithRotationFocusTaskNode::TickTask(UBehaviorTreeComponent& OwnerComp,
 			//AI面朝Player
 			FVector AILocation = AI->GetActorLocation();
 			FVector TargetLocation = OwnerComp.GetBlackboardComponent()->GetValueAsVector(FName("PlayerLocation"));//移动时保证始终朝向Player
-			GEngine->AddOnScreenDebugMessage(0, 2.f, FColor::Red, FString::Printf(TEXT("PlayerLocation:%f %f %f"), TargetLocation.X,TargetLocation.Y,TargetLocation.Z));
+			//GEngine->AddOnScreenDebugMessage(0, 2.f, FColor::Red, FString::Printf(TEXT("PlayerLocation:%f %f %f"), TargetLocation.X,TargetLocation.Y,TargetLocation.Z));
 			FRotator Turn_Z = AI->GetLookAtRotation(AILocation, TargetLocation);
 			AI->SetActorRotation(Turn_Z);
 		}

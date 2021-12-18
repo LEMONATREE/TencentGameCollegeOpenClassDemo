@@ -422,3 +422,34 @@ void ApicCharacter::Tick(float DeltaTime)
 		ToSpawnEnermy = false;
 	}
 }
+
+void ApicCharacter::SetViewOnBlackHole(ABlackHoleActor* BlackHole)
+{
+	//将视角移到blackhole上
+	APlayerController* MainController = Cast<APlayerController>(Controller);
+	if (MainController)
+	{
+		MainController->SetViewTargetWithBlend(BlackHole, 1.f);
+	}
+	//隔3s复原视角	
+	DelayResetViewFromBlackHole(3.f);
+}
+void ApicCharacter::DelaySetViewOnBlackHole(ABlackHoleActor* BlackHole, float DelayTime)
+{
+	FTimerHandle OutHandle;
+	FTimerDelegate Del = FTimerDelegate::CreateUObject(this, &ApicCharacter::SetViewOnBlackHole, BlackHole);
+	GetWorld()->GetTimerManager().SetTimer(OutHandle, Del, DelayTime, false);
+}
+void ApicCharacter::ResetViewFromBlackHole()
+{
+	APlayerController* MainController = Cast<APlayerController>(Controller);
+	if (MainController)
+	{
+		MainController->SetViewTargetWithBlend(this, 1.f);
+	}
+}
+void ApicCharacter::DelayResetViewFromBlackHole(float DelayTime)
+{
+	FTimerHandle OutHandle;
+	GetWorld()->GetTimerManager().SetTimer(OutHandle, this, &ApicCharacter::ResetViewFromBlackHole, DelayTime);
+}

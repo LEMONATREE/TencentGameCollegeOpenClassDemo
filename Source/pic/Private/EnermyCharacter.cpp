@@ -104,7 +104,7 @@ void AEnermyCharacter::StopBehaviorTree()
 	if (AI)
 	{
 		AI->BehaviorTreeCompo->StopTree(EBTStopMode::Safe);
-		GEngine->AddOnScreenDebugMessage(0, 2.f, FColor(23, 233, 4, 255), FString::Printf(TEXT("Behavor!!Stop")));
+		//GEngine->AddOnScreenDebugMessage(0, 2.f, FColor(23, 233, 4, 255), FString::Printf(TEXT("Behavor!!Stop")));
 	}
 }
 /** Overlap */

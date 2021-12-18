@@ -18,7 +18,7 @@ ARotationActor::ARotationActor()
 /** Collision & Overlap */
 void ARotationActor::OnOverlapBegin(class AActor* OverlappedActor, class AActor* OtherActor)
 {
-	GEngine->AddOnScreenDebugMessage(0, 2.f, FColor::Red, FString::Printf(TEXT("Rotation Overlap Begin1:%s"), *OtherActor->GetName()));
+	//GEngine->AddOnScreenDebugMessage(0, 2.f, FColor::Red, FString::Printf(TEXT("Rotation Overlap Begin1:%s"), *OtherActor->GetName()));
 	if (OtherActor && (OtherActor != this))
 	{
 		//TODO:切换视角到blackhole
@@ -47,9 +47,24 @@ void ARotationActor::OnOverlapBegin(class AActor* OverlappedActor, class AActor*
 			//SetTimer只能调用本地函数，不能在这延时调用player的函数?
 			//因此只能在pic的spawn函数中设置一个delaytime参数以控制其生成延时。
 			DelaySpawnBlackHole(2.f);//自己生成
+			DelaySetViewOnBlackHole();
 			IntoBossGame = true;//防止运行两次、防止运行自身
 		}
 	}
+}
+void ARotationActor::SetViewOnBlackHole()
+{
+	ApicCharacter* Player = Cast<ApicCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	if (Player && MyBlackHole)
+	{
+		StopTimerHandle(ViewHandle);
+		Player->SetViewOnBlackHole(MyBlackHole);
+	}
+}
+void ARotationActor::DelaySetViewOnBlackHole()
+{
+	//每隔0.1s尝试执行，直到执行成功
+	GetWorld()->GetTimerManager().SetTimer(ViewHandle, this, &ARotationActor::SetViewOnBlackHole, 0.1f, true);
 }
 /** Move */
 void ARotationActor::MoveTo(FVector TargetLocation, float DeltaTime)
@@ -109,18 +124,18 @@ void ARotationActor::StopTimerHandle(FTimerHandle &InHandle)//输入handle必须
 void ARotationActor::SpawnBlackHole()
 {
 	FString Path = TEXT("Blueprint'/Game/MyResource/MyBlackHoleActor.MyBlackHoleActor_C'");
-	FVector SpawnLocation = FVector(-6500.f, -300.f, 400.f);
-	FRotator SpawnRotation = FRotator(0.f);
+	FVector SpawnLocation = FVector(-3500.f, -300.f, 400.f);
+	FRotator SpawnRotation = FRotator(0.f, 180.f, 0.f);
 	UClass* Load_BP = LoadBP<ABlackHoleActor>(Path);//没有读取蓝图会崩溃
 	FTransform SpawnTransform(SpawnRotation, SpawnLocation);
-	ABlackHoleActor* ref = Cast<ABlackHoleActor>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this, Load_BP, SpawnTransform));
-	if (ref)//延迟spawn的初始化过程
+	MyBlackHole = Cast<ABlackHoleActor>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this, Load_BP, SpawnTransform));
+	if (MyBlackHole)//延迟spawn的初始化过程
 	{
-		ref->SetIntoBossGame(false);
-		ref->SetNewScale3D(FVector(4.f));
-		ref->SetScaleSpeed(0.2f);
+		MyBlackHole->SetIntoBossGame(false);
+		MyBlackHole->SetNewScale3D(FVector(40.f));
+		MyBlackHole->SetScaleSpeed(2.f);
 	}
-	UGameplayStatics::FinishSpawningActor(ref, SpawnTransform);//延迟spawn
+	UGameplayStatics::FinishSpawningActor(MyBlackHole, SpawnTransform);//延迟spawn
 }
 void ARotationActor::DelaySpawnBlackHole(float DelayTime)
 {

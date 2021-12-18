@@ -13,14 +13,20 @@
 ABlackHoleActor::ABlackHoleActor()
 {
  	PrimaryActorTick.bCanEverTick = true;
-	/** Mesh */
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MyMeshcomp"));
-	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	/** Scene */
+	SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
+	SceneComp->SetupAttachment(GetRootComponent());
+	SceneComp->SetRelativeLocation(FVector(0.f));
 	/** Collision & Overlap */
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("MySphereComp"));
-	SphereComp->SetupAttachment(MeshComp);
+	SphereComp->SetupAttachment(SceneComp);
 	SphereComp->SetSphereRadius(1000);
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ABlackHoleActor::OverLap);
+	/** Mesh */
+	//让MeshComp绑定在SphereComp上，从而调整Mesh的位置
+	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MyMeshcomp"));
+	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	MeshComp->SetupAttachment(SceneComp);
 }
 /** Collision & Overlap */
 void ABlackHoleActor::OverLap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -142,8 +148,8 @@ void ABlackHoleActor::BeginPlay()
 	Super::BeginPlay();
 	if (IntoBossGame == false)
 	{
-		NewScale3D = FVector(4.f);
-		ScaleSpeed = 0.2f;
+		NewScale3D = FVector(40.f);
+		ScaleSpeed = 2.f;
 	}
 	else
 	{

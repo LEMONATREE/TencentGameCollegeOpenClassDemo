@@ -22,10 +22,13 @@ protected:
 	UBoxComponent* RingCollisionComp;
 	TArray<UBoxComponent*> MyCollisionSet;
 	bool IsDamageApplied = false;	
+	bool IsStabAttack = false;//判断是否由BossStabAttack产生
 public:
 	/** Collision & Overlap */
 	UFUNCTION()
 	void OverLap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	FORCEINLINE bool GetIsStabAttack() const { return IsStabAttack; }
+	FORCEINLINE void SetIsStabAttack(bool value) { IsStabAttack = value; }
 	/** Destroy */
 	void RingDestroy();
 

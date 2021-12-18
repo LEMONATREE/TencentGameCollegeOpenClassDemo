@@ -7,6 +7,7 @@
 #include "LoadResource.h"
 #include "Components/BoxComponent.h"
 #include "TimerManager.h"
+#include "BlackHoleActor.h"
 #include "RotationActor.generated.h"
 
 UCLASS()
@@ -50,9 +51,14 @@ public:
 	/** Spawn Blackhole */
 	void SpawnBlackHole();
 	void DelaySpawnBlackHole(float DelayTime);
+	ABlackHoleActor* MyBlackHole = nullptr;
 protected:
 	virtual void BeginPlay() override;
 public:	
 	ARotationActor();
 	virtual void Tick(float DeltaTime) override;
+
+	void SetViewOnBlackHole();
+	void DelaySetViewOnBlackHole();
+	FTimerHandle ViewHandle;
 };

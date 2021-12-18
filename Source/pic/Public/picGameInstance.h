@@ -20,7 +20,7 @@ private:
 	int CurrentMap = 0;
 	double GameBeginTime = 0.0;
 	bool RotationActorIsSpawn = false;
-	int TotalEnermyNum = 20;
+	int TotalEnermyNum = 15;
 	/** Player Info */
 	int PlayerLevel = 0;
 	float PlayerScore = 0.f;

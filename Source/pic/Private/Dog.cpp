@@ -13,9 +13,6 @@ ADog::ADog()
 	MyMeshcomp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MyMeshcomp"));
 	MyMeshcomp->SetCollisionEnabled(ECollisionEnabled::NoCollision);   //取消物体的碰撞
 	RootComponent = MyMeshcomp;	  //设置 MyMeshcomp 为根组件
-
-	/*MySphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("MySphereComp"));
-	MySphereComp->SetupAttachment(MyMeshcomp);*/
 }
 
 void ADog::Dogmove(float time)
@@ -25,9 +22,7 @@ void ADog::Dogmove(float time)
 	FVector TangenDirection = FVector(NormalDirection.Y, -NormalDirection.X, 0.f);
 	float Move = time * Speed;
 	NowLocation += TangenDirection / TangenDirection.Size() * Move;
-	//NowLocation.Y += Move;
 	this->SetActorLocation(NowLocation);
-	
 }
 
 float ADog::GetBoomTime()
@@ -38,8 +33,6 @@ float ADog::GetBoomTime()
 	float Gap=this->BoomGap;
 	for (auto Actor : FoundpicCharacter)
 	{
-		//GEngine->AddOnScreenDebugMessage(0, 10.f, FColor::Red, FString::Printf(TEXT("Time Delay %f %d"), Actor->CustomTimeDilation,(Actor->CustomTimeDilation==0.05f)));
-		//如果不加f则判断不等??
 		if (Actor->CustomTimeDilation == 0.3f)
 		{
 			return this->BoomGap * 20;
@@ -49,40 +42,25 @@ float ADog::GetBoomTime()
 }
 void ADog::BulletTime()
 {
-	//TODO:
-
 	this->BoomBoomGap = (this->BoomBoomGap == 30) ? 600 : 30;
-	GEngine->AddOnScreenDebugMessage(0, 2.f, FColor::Red, FString::Printf(TEXT("NooooAdsssre:%d"), this->BoomBoomGap));
 }
-
 
 void ADog::SpawnUsefulActor()
 {
-	 //If the usefulactorbp is valid
 	if (UsefulActorBP)
 	{
 		FActorSpawnParameters SpawnParams;
-		ABome * ActorRef = GetWorld()->SpawnActor<ABome>(UsefulActorBP, GetTransform(), SpawnParams);
-		//GLog->Log("Spawned the UsefulActor.");
- }
+		ABome* ActorRef = GetWorld()->SpawnActor<ABome>(UsefulActorBP, GetTransform(), SpawnParams);
+	}
 }
-// Called when the game starts or when spawned
 void ADog::BeginPlay()
 {
-
 	Super::BeginPlay();
-	//FTimerHandle OutHandle;
-	//GetWorld()->GetTimerManager().SetTimer(OutHandle, this, &ADog::SpawnUsefulActor, TimeToSpawn);
-
 }
-
-// Called every frame
 void ADog::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	//RandomChange();
 	Dogmove(DeltaTime);
-	//ChangeDirection();
 	if (this->CustomTimeDilation == 0.05f)
 	{
 		this->BoomBoomGap = 600;
@@ -95,11 +73,8 @@ void ADog::Tick(float DeltaTime)
 	this->Now++;
 	if (this->Now > this->BoomBoomGap)
 	{
-		//GEngine->AddOnScreenDebugMessage(0, 2.f, FColor::Red, FString::Printf(TEXT("AAAcore:%d"), this->BoomBoomGap));
 		this->Now %= this->BoomBoomGap;
 		this->SpawnUsefulActor();
 	}
-	//ADog::SpawnUsefulActor();
-
 }
 
